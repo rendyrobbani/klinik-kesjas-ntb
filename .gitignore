@@ -1,0 +1,5 @@
+.idea/
+.*/
+.DS_Store
+backend/resources/application.json
+vendor/

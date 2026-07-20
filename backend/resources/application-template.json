@@ -1,0 +1,11 @@
+{
+	"database": {
+		"url": "mysql:host=localhost:3306;dbname=klinik_kesjas_ntb_dev",
+		"username": "root",
+		"password": ""
+	},
+	"security": {
+		"secretKey": "UgPxhtM7wmsbCe24",
+		"expired": 1
+	}
+}
