@@ -90,11 +90,13 @@ class Router
 		} catch (BadRequestException $badRequestException) {
 			http_response_code(400);
 			header("Content-Type: application/json");
-			if ($badRequestException->getErrors() != null && sizeof($badRequestException->getErrors()) > 0) echo json_encode($badRequestException->getErrors());
-			echo json_encode([
-				"status" => 400,
-				"message" => $badRequestException->getMessage() ?? "Bad Request",
-			]);
+			if ($badRequestException->getErrors() !== null && sizeof($badRequestException->getErrors()) > 0) echo json_encode($badRequestException->getErrors());
+			else {
+				echo json_encode([
+					"status" => 400,
+					"message" => $badRequestException->getMessage() ?? "Bad Request",
+				]);
+			}
 		} catch (UnauthorizedException $unauthorizedException) {
 			http_response_code(401);
 			header("Content-Type: application/json");

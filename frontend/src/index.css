@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nova+Square&display=swap');
+@import "tailwindcss";
+
+@theme {
+    --font-nova: "Nova Square", sans-serif;
+    --font-roboto: "Roboto", sans-serif;
+}
+
+@layer base {
+    html {
+        @apply
+        font-roboto;
+        font-size: 13px;
+        color: var(--color-slate-700);
+        fill: var(--color-slate-700);
+    }
+
+    input,
+    button,
+    textarea,
+    select {
+        @apply
+        outline-none
+        focus:outline-none
+        focus:ring-0;
+    }
+
+    button,
+    select,
+    input[type="checkbox"] {
+        @apply cursor-pointer;
+    }
+
+    button:disabled,
+    select:disabled,
+    input[type="checkbox"]:disabled {
+        @apply cursor-default;
+    }
+}
