@@ -2,6 +2,7 @@
 
 namespace RendyRobbani\Klinik\Kesjas\NTB\App\Controller;
 
+use RendyRobbani\Klinik\Kesjas\NTB\App\Context\ApplicationContext;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Request\LayananRequest;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Service\LayananService;
 
@@ -13,11 +14,11 @@ class LayananController extends AbstractController
 	private LayananService $layananService;
 
 	/**
-	 * @param LayananService $layananService
+	 * @throws \Exception
 	 */
-	public function __construct(LayananService $layananService)
+	public function __construct()
 	{
-		$this->layananService = $layananService;
+		$this->layananService = ApplicationContext::layananService();
 		parent::__construct();
 	}
 

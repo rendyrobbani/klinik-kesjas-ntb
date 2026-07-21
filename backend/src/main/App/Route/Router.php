@@ -74,7 +74,6 @@ class Router
 				}
 
 				$controller = new $route["controller"]();
-
 				$controller->{$route["action"]}($params);
 
 				return;

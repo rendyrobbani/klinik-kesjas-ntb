@@ -144,6 +144,11 @@ readonly class LayananResponse
 	/**
 	 * @var string|null
 	 */
+	public string|null $namaPetugas;
+
+	/**
+	 * @var string|null
+	 */
 	public string|null $createdAt;
 
 	/**
@@ -210,6 +215,7 @@ readonly class LayananResponse
 		$response->permasalahan = $entity->getPermasalahan();
 		$response->solusi = $entity->getSolusi();
 		$response->idPetugas = $entity->getIdPetugas();
+		$response->namaPetugas = $entity->getNamaPetugas();
 		$response->createdAt = $entity->getCreatedAt();
 		$response->createdBy = $entity->getCreatedBy();
 		$response->updatedAt = $entity->getUpdatedAt();

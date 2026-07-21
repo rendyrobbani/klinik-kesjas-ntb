@@ -3,10 +3,14 @@
 namespace RendyRobbani\Klinik\Kesjas\NTB\App\Context;
 
 use RendyRobbani\Klinik\Kesjas\NTB\App\Connection\Connection;
+use RendyRobbani\Klinik\Kesjas\NTB\App\Repository\LayananRepository;
+use RendyRobbani\Klinik\Kesjas\NTB\App\Repository\LayananRepositoryImpl;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Repository\UserRepository;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Repository\UserRepositoryImpl;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Service\AuthService;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Service\AuthServiceImpl;
+use RendyRobbani\Klinik\Kesjas\NTB\App\Service\LayananService;
+use RendyRobbani\Klinik\Kesjas\NTB\App\Service\LayananServiceImpl;
 
 class ApplicationContext
 {
@@ -27,6 +31,21 @@ class ApplicationContext
 	{
 		if (self::$userRepository === null) self::$userRepository = new UserRepositoryImpl(Connection::instance());
 		return self::$userRepository;
+	}
+
+	/**
+	 * @var LayananRepository|null
+	 */
+	private static null|LayananRepository $layananRepository = null;
+
+	/**
+	 * @return LayananRepository
+	 * @throws \Exception
+	 */
+	public static function layananRepository(): LayananRepository
+	{
+		if (self::$layananRepository === null) self::$layananRepository = new LayananRepositoryImpl(Connection::instance());
+		return self::$layananRepository;
 	}
 
 	/**
@@ -64,5 +83,20 @@ class ApplicationContext
 	{
 		if (self::$authService === null) self::$authService = new AuthServiceImpl(self::userRepository());
 		return self::$authService;
+	}
+
+	/**
+	 * @var LayananService|null
+	 */
+	private static null|LayananService $layananService = null;
+
+	/**
+	 * @return LayananService
+	 * @throws \Exception
+	 */
+	public static function layananService(): LayananService
+	{
+		if (self::$layananService === null) self::$layananService = new LayananServiceImpl(Connection::instance(), self::userRepository(), self::layananRepository());
+		return self::$layananService;
 	}
 }

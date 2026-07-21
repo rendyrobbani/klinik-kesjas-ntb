@@ -142,6 +142,11 @@ class LayananEntity
 	/**
 	 * @var string|null
 	 */
+	private string|null $namaPetugas;
+
+	/**
+	 * @var string|null
+	 */
 	private string|null $createdAt;
 
 	/**
@@ -657,6 +662,24 @@ class LayananEntity
 	public function setIdPetugas(string|null $idPetugas): LayananEntity
 	{
 		$this->idPetugas = $idPetugas;
+		return $this;
+	}
+
+	/**
+	 * @return string|null
+	 */
+	public function getNamaPetugas(): string|null
+	{
+		return $this->namaPetugas;
+	}
+
+	/**
+	 * @param string|null $namaPetugas
+	 * @return LayananEntity
+	 */
+	public function setNamaPetugas(string|null $namaPetugas): LayananEntity
+	{
+		$this->namaPetugas = $namaPetugas;
 		return $this;
 	}
 

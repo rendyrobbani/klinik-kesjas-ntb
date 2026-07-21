@@ -1,22 +1,32 @@
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {LoginPage} from "../pages/login/LoginPage.tsx";
 import {ApplicationContext} from "./ApplicationContext.tsx";
-import {type ReactNode, useState} from "react";
+import {type ReactNode, useRef, useState} from "react";
 import {ModalType} from "../components/modal/ModalType.tsx";
 import {Modal} from "../components/modal/Modal.tsx";
 import type {ApplicationContextType} from "./ApplicationContextType.ts";
 import ProgressActivitySVG from "../assets/progress_activity.svg?react"
 import NotFound from "../pages/error/NotFound.tsx";
-import {SelectPage} from "../pages/select/SelectPage.tsx";
+import {Dashboard} from "../components/dashboard/Dashboard.tsx";
+import {Home} from "../pages/home/Home.tsx";
+import {DialogRoot} from "../components/dialog/DialogRoot.tsx";
+import type {DialogRef} from "../components/dialog/DialogRef.ts";
 
 export const Application = () => {
 
     const [modalTop, setModalTop] = useState(0);
     const [modals, setModals] = useState<Record<string, ReactNode>>({});
 
+    const dialogRef = useRef<null | DialogRef>(null);
+    const [dialogComponent, setDialogComponent] = useState<null | ReactNode>(null);
+
     const [showLoading, setShowLoading] = useState(false);
 
-    const token = (): null | string => {
+    const setToken = (token: undefined | null | string): void => {
+        document.cookie = "x-auth-token=" + (token ?? "");
+    }
+
+    const getToken = (): null | string => {
         try {
             return (document.cookie.split(";").filter(c => c.trim().toLowerCase().startsWith("x-auth-token"))[0] ?? "").split("=")[1];
         } catch {
@@ -47,8 +57,32 @@ export const Application = () => {
 
     const openWarningModal = (message: string) => openModal(ModalType.WARNING, message);
 
+    const hideDialog = async () => {
+        await dialogRef.current?.hide();
+    }
+
+    const showDialog = async () => {
+        await dialogRef.current?.show();
+    }
+
+    const closeDialog = async () => {
+        await hideDialog();
+        setDialogComponent(null);
+    }
+
+    const openDialog = async (dialog: ReactNode) => {
+        if (!!dialogComponent) return;
+        setDialogComponent(dialog);
+        await showDialog();
+    }
+
     const applicationContext = (): ApplicationContextType => ({
-        token,
+        get token() {
+            return getToken();
+        },
+        set token(token: string | null | undefined) {
+            setToken(token);
+        },
         set showLoading(value: boolean) {
             setShowLoading(value);
         },
@@ -60,6 +94,10 @@ export const Application = () => {
         openErrorModal,
         openSuccessModal,
         openWarningModal,
+        hideDialog,
+        showDialog,
+        closeDialog,
+        openDialog,
     });
 
     return (
@@ -72,7 +110,13 @@ export const Application = () => {
                     },
                     {
                         path: "/",
-                        element: <SelectPage/>,
+                        element: <Dashboard/>,
+                        children: [
+                            {
+                                index: true,
+                                element: <Home/>,
+                            }
+                        ],
                     },
                     {
                         path: "*",
@@ -86,9 +130,10 @@ export const Application = () => {
             <div className={"fixed z-800 right-0 flex flex-col items-end justify-start gap-1"} style={{top: modalTop + "rem"}}>
                 {Object.values(modals).map(modal => modal)}
             </div>
+            <DialogRoot ref={dialogRef} children={dialogComponent} zIndex={400}/>
             {showLoading && (
                 <div className={"fixed inset-0 z-900 w-full h-screen flex items-center justify-center bg-black/50"}>
-                    <ProgressActivitySVG className={"w-40 h-40 fill-red-500 animate-spin"}/>
+                    <ProgressActivitySVG className={"w-40 h-40 fill-red-700 animate-spin"}/>
                 </div>
             )}
         </ApplicationContext.Provider>

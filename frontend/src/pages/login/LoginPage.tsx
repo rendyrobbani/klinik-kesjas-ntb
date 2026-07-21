@@ -59,8 +59,8 @@ export const LoginPage = () => {
     }
 
     useEffect(() => {
-        const token = applicationContext?.token() ?? null;
-        if (token != null) navigate("/");
+        const token = applicationContext?.token ?? null;
+        if (token != null && token != "") navigate("/");
     }, []);
 
     useEffect(() => {

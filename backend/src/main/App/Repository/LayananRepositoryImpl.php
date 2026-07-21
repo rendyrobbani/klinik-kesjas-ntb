@@ -43,6 +43,7 @@ readonly class LayananRepositoryImpl implements LayananRepository
 			->setPermasalahan($row["permasalahan"])
 			->setSolusi($row["solusi"])
 			->setIdPetugas($row["id_petugas"])
+			->setNamaPetugas($row["nama_petugas"])
 			->setCreatedAt($row["created_at"])
 			->setCreatedBy($row["created_by"])
 			->setUpdatedAt($row["updated_at"])
@@ -57,7 +58,7 @@ readonly class LayananRepositoryImpl implements LayananRepository
 	 */
 	function selectAll(): array
 	{
-		$statement = $this->connection->prepare("select * from layanan");
+		$statement = $this->connection->prepare("select a.*, b.nama as nama_petugas from layanan a left join user b on b.id = a.id_petugas");
 		$statement->execute();
 		$rows = $statement->fetchAll(\PDO::FETCH_NAMED);
 		return array_map(fn($row) => $this->toEntity($row), $rows);
@@ -68,7 +69,7 @@ readonly class LayananRepositoryImpl implements LayananRepository
 	 */
 	function selectById(string $id): ?LayananEntity
 	{
-		$statement = $this->connection->prepare("select * from layanan where id = :id");
+		$statement = $this->connection->prepare("select a.*, b.nama as nama_petugas from layanan a left join user b on b.id = a.id_petugas where a.id = :id");
 		$statement->bindValue("id", $id);
 		$statement->execute();
 		if ($row = $statement->fetch(\PDO::FETCH_NAMED)) return $this->toEntity($row);
