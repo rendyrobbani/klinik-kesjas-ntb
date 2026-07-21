@@ -4,10 +4,13 @@ import logoKesjas from "../../assets/logo-kesjas.png";
 import LoginSVG from "../../assets/login.svg?react";
 import ProgressActivitySVG from "../../assets/progress_activity.svg?react";
 import {useApplicationContext} from "../../hook/useApplicationContext.tsx";
+import {useNavigate} from "react-router-dom";
 
 export const LoginPage = () => {
 
     const applicationContext = useApplicationContext();
+
+    const navigate = useNavigate();
 
     const usernameRef = useRef<null | HTMLInputElement>(null);
     const passwordRef = useRef<null | HTMLInputElement>(null);
@@ -27,8 +30,9 @@ export const LoginPage = () => {
 
         try {
             const url = "http://localhost:8080/api/login"
-            const opt = {
+            const opt: RequestInit = {
                 method: "POST",
+                credentials: "include",
                 body: JSON.stringify({
                     username: usernameRef.current?.value,
                     password: passwordRef.current?.value,
@@ -36,6 +40,7 @@ export const LoginPage = () => {
             }
             const response = await fetch(url, opt);
             if (response.ok) {
+                navigate("/");
             } else {
                 const body: Record<string, string[]> = await response.json();
                 if (!!body) {
@@ -52,6 +57,11 @@ export const LoginPage = () => {
             setShowLoading(false);
         }
     }
+
+    useEffect(() => {
+        const token = applicationContext?.token() ?? null;
+        if (token != null) navigate("/");
+    }, []);
 
     useEffect(() => {
         if (!checkboxRef.current) return;

@@ -7,14 +7,22 @@ import {Modal} from "../components/modal/Modal.tsx";
 import type {ApplicationContextType} from "./ApplicationContextType.ts";
 import ProgressActivitySVG from "../assets/progress_activity.svg?react"
 import NotFound from "../pages/error/NotFound.tsx";
+import {SelectPage} from "../pages/select/SelectPage.tsx";
 
 export const Application = () => {
 
     const [modalTop, setModalTop] = useState(0);
     const [modals, setModals] = useState<Record<string, ReactNode>>({});
 
-
     const [showLoading, setShowLoading] = useState(false);
+
+    const token = (): null | string => {
+        try {
+            return (document.cookie.split(";").filter(c => c.trim().toLowerCase().startsWith("x-auth-token"))[0] ?? "").split("=")[1];
+        } catch {
+            return null;
+        }
+    }
 
     const closeModal = (uuid: string) => {
         setModals(from => {
@@ -39,8 +47,8 @@ export const Application = () => {
 
     const openWarningModal = (message: string) => openModal(ModalType.WARNING, message);
 
-
     const applicationContext = (): ApplicationContextType => ({
+        token,
         set showLoading(value: boolean) {
             setShowLoading(value);
         },
@@ -61,6 +69,10 @@ export const Application = () => {
                     {
                         path: "/login",
                         element: <LoginPage/>,
+                    },
+                    {
+                        path: "/",
+                        element: <SelectPage/>,
                     },
                     {
                         path: "*",

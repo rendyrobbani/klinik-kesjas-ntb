@@ -1,4 +1,5 @@
 export type ApplicationContextType = {
+    token: () => null | string;
     showLoading: boolean;
     setModalTop: (value: number) => void;
     openInfoModal: (message: string) => void;

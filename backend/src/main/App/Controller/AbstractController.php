@@ -48,9 +48,9 @@ abstract class AbstractController
 		http_response_code($status);
 		if ($token = $this->encodeToken()) setcookie("x-auth-token", $token, [
 			"path" => "/",
-			"httponly" => true,
-			"secure" => false,
-			"samesite" => "Strict"
+//			"httponly" => true,
+//			"secure" => false,
+//			"samesite" => "Strict"
 		]);
 	}
 
