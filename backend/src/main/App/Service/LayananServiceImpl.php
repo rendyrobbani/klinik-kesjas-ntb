@@ -185,6 +185,7 @@ class LayananServiceImpl implements LayananService
 				$entity->setIsDeleted(true);
 				$entity->setDeletedAt(date_format(new \DateTimeImmutable(), "Y-m-d H:i:s"));
 				$entity->setDeletedBy(ApplicationContext::getIdUser());
+				$this->layananRepository->save($entity);
 			}
 
 			$this->connection->commit();
