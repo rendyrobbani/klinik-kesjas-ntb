@@ -70,11 +70,11 @@ class Router
 
 				foreach ($route["middleware"] as $middlewareClass) {
 					$middleware = new $middlewareClass();
-					if (!$middleware->handle()) return;
+					$middleware->handle();
 				}
 
 				$controller = new $route["controller"]();
-				$controller->{$route["action"]}($params);
+				$controller->{$route["action"]}(...$params);
 
 				return;
 			}

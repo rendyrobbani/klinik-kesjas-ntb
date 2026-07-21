@@ -23,7 +23,8 @@ abstract class AbstractController
 		return JWT::encode([
 			"id" => $idUser,
 			"iat" => time(),
-			"exp" => time() + ($config->expiredTime() * 60),
+			"exp" => time() + 5,
+			//"exp" => time() + ($config->expiredTime() * 60),
 		], $config->secretKey(), "HS256");
 	}
 

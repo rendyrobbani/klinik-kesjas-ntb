@@ -23,6 +23,6 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 
 $router->post("/login", AuthController::class, "login");
 
-$router->get("/layanan", LayananController::class, "selectAll");
-//$router->get("/layanan", LayananController::class, "selectAll", [AuthMiddleware::class]);
+$router->get("/layanan", LayananController::class, "selectAll", [AuthMiddleware::class]);
 $router->get("/layanan/{id}", LayananController::class, "selectById", [AuthMiddleware::class]);
+$router->delete("/layanan/{id}", LayananController::class, "deleteById", [AuthMiddleware::class]);

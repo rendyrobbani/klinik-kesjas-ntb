@@ -67,6 +67,18 @@ readonly class LayananRepositoryImpl implements LayananRepository
 	/**
 	 * @inheritDoc
 	 */
+	function selectByIsDeleted(bool $isDeleted): array
+	{
+		$statement = $this->connection->prepare("select a.*, b.nama as nama_petugas from layanan a left join user b on b.id = a.id_petugas where a.is_deleted = :is_deleted");
+		$statement->bindValue("is_deleted", $isDeleted, \PDO::PARAM_BOOL);
+		$statement->execute();
+		$rows = $statement->fetchAll(\PDO::FETCH_NAMED);
+		return array_map(fn($row) => $this->toEntity($row), $rows);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	function selectById(string $id): ?LayananEntity
 	{
 		$statement = $this->connection->prepare("select a.*, b.nama as nama_petugas from layanan a left join user b on b.id = a.id_petugas where a.id = :id");

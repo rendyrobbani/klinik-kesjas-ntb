@@ -25,7 +25,7 @@ export const Home = () => {
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(10);
 
-    const [listLayanan, setListLayanan] = useState<LayananResponse[]>([]);
+    const [listLayanan, setListLayanan] = useState<null | LayananResponse[]>(null);
     const [rows, setRows] = useState<LayananResponse[]>([]);
 
     const handleDelete = async (row: LayananResponse) => {
@@ -44,7 +44,31 @@ export const Home = () => {
                     </div>
                 </div>
                 <div className={"flex justify-end gap-2 py-4"}>
-                    <button className={"w-24 h-10 rounded duration-150 bg-red-500 hover:bg-red-400 focus:ring-4 focus:ring-red-700 text-white"}>
+                    <button className={"w-24 h-10 rounded duration-150 bg-red-500 hover:bg-red-400 focus:ring-4 focus:ring-red-700 text-white"} onClick={async e => {
+                        e.currentTarget.blur();
+                        try {
+                            applicationContext!.showLoading = true;
+
+                            fetch(`http://localhost:8080/api/layanan/${row.id}`, {
+                                headers: {
+                                    "Accept": "application/json",
+                                    "Authorization": `Bearer ${applicationContext?.token ?? ""}`
+                                },
+                                method: "DELETE",
+                            }).then(response => {
+                                if (response.ok) {
+                                    applicationContext!.closeDialog();
+                                    applicationContext!.openSuccessModal(`Data pelayanan a.n. <b>${row.nama}</b> berhasil dihapus`);
+                                    setListLayanan(null);
+                                } else {
+                                    applicationContext!.openErrorModal(`Data pelayanan a.n. <b>${row.nama}</b> gagal dihapus`);
+                                    applicationContext!.showLoading = false;
+                                }
+                            });
+                        } catch {
+                        }
+                    }}
+                    >
                         Hapus
                     </button>
                     <button className={"w-24 h-10 rounded duration-150 bg-neutral-500 hover:bg-neutral-400 focus:ring-4 focus:ring-neutral-700 text-white"} onClick={() => applicationContext!.closeDialog()}>
@@ -61,6 +85,7 @@ export const Home = () => {
     }, []);
 
     useEffect(() => {
+        if (listLayanan != null) return;
         applicationContext!.showLoading = true;
         fetch("http://localhost:8080/api/layanan", {
             headers: {
@@ -71,11 +96,20 @@ export const Home = () => {
         }).then(response => {
             if (response.ok) response.json().then((body: LayananResponse[]) => {
                 setListLayanan(body)
+                applicationContext!.showLoading = false;
             });
-            else response.json().then((error: { message: string }) => {
-                applicationContext!.openErrorModal(error.message);
-            });
-            applicationContext!.showLoading = false;
+            else {
+                if (response.status == 401) {
+                    applicationContext!.token = null;
+                    applicationContext!.showLoading = false;
+                    navigate("/login");
+                } else {
+                    response.json().then((error: { message: string }) => {
+                        applicationContext!.openErrorModal(error.message);
+                        applicationContext!.showLoading = false;
+                    });
+                }
+            }
         }).catch(error => {
             applicationContext!.openErrorModal(error.message);
             applicationContext!.showLoading = false;
@@ -84,7 +118,7 @@ export const Home = () => {
 
     useEffect(() => {
         const filter: LayananResponse[] = [];
-        listLayanan.forEach(row => {
+        (listLayanan ?? []).forEach(row => {
             let value = 0;
             if (SearchUtil.compare(find, row.tanggal)) value++;
             // if (SearchUtil.compare(find, row.nomorSurat)) value++;

@@ -13,6 +13,13 @@ interface LayananRepository
 	function selectAll(): array;
 
 	/**
+	 * @param bool $isDeleted
+	 * @return LayananEntity[]
+	 * @throws \Exception
+	 */
+	function selectByIsDeleted(bool $isDeleted): array;
+
+	/**
 	 * @param string $id
 	 * @return LayananEntity|null
 	 * @throws \Exception

@@ -36,7 +36,7 @@ class LayananServiceImpl implements LayananService
 	 */
 	function selectAll(): array
 	{
-		return array_map(fn($entity) => LayananResponse::fromEntity($entity), $this->layananRepository->selectAll());
+		return array_map(fn($entity) => LayananResponse::fromEntity($entity), $this->layananRepository->selectByIsDeleted(false));
 	}
 
 	/**
@@ -176,13 +176,23 @@ class LayananServiceImpl implements LayananService
 	 */
 	function deleteById(int $id): LayananResponse
 	{
-		$entity = $this->layananRepository->selectById($id);
-		if ($entity == null) throw new NotFoundException();
-		if (!$entity->getIsDeleted()) {
-			$entity->setIsDeleted(true);
-			$entity->setDeletedAt(date_format(new \DateTimeImmutable(), "Y-m-d H:i:s"));
-			$entity->setDeletedBy(ApplicationContext::getIdUser());
+		try {
+			$this->connection->beginTransaction();
+
+			$entity = $this->layananRepository->selectById($id);
+			if ($entity == null) throw new NotFoundException();
+			if (!$entity->getIsDeleted()) {
+				$entity->setIsDeleted(true);
+				$entity->setDeletedAt(date_format(new \DateTimeImmutable(), "Y-m-d H:i:s"));
+				$entity->setDeletedBy(ApplicationContext::getIdUser());
+			}
+
+			$this->connection->commit();
+
+			return LayananResponse::fromEntity($entity);
+		} catch (\Throwable $exception) {
+			$this->connection->rollBack();
+			throw $exception;
 		}
-		return LayananResponse::fromEntity($entity);
 	}
 }
