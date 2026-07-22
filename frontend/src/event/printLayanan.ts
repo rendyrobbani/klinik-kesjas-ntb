@@ -669,7 +669,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                                 borders: noborder(),
                                                                 children: [
                                                                     new Paragraph({
-                                                                        text: "TANDA TANGAN",
+                                                                        text: "Tanda Tangan",
                                                                         alignment: "center",
                                                                     })
                                                                 ],
@@ -678,7 +678,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                                 borders: noborder(),
                                                                 children: [
                                                                     new Paragraph({
-                                                                        text: "TANDA TANGAN",
+                                                                        text: "Tanda Tangan",
                                                                         alignment: "center",
                                                                     })
                                                                 ],
@@ -691,7 +691,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                                 borders: noborder(),
                                                                 children: [
                                                                     new Paragraph({
-                                                                        text: "PETUGAS",
+                                                                        text: "Petugas",
                                                                         alignment: "center",
                                                                     })
                                                                 ],
@@ -700,7 +700,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                                 borders: noborder(),
                                                                 children: [
                                                                     new Paragraph({
-                                                                        text: "WARGA",
+                                                                        text: "Warga",
                                                                         alignment: "center",
                                                                     })
                                                                 ],
