@@ -33,7 +33,7 @@ interface LayananService
 	 * @return LayananResponse
 	 * @throws \Throwable
 	 */
-	function update(LayananRequest $request, int $id): LayananResponse;
+	function updateById(LayananRequest $request, int $id): LayananResponse;
 
 	/**
 	 * @param int $id

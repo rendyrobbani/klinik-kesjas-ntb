@@ -1,6 +1,8 @@
 import {BorderStyle, Document, ImageRun, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import type {LayananResponse} from "../pages/home/LayananResponse.ts";
 import logoPolri from "../assets/logo-polri.png";
+import sizeOf from "image-size";
+import {Buffer} from "buffer";
 
 const convertMillimetersToTwip = (mm: number) => {
     return mm * 56.7;
@@ -15,6 +17,15 @@ const noborder = () => ({
 
 export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
     const logo = await (await fetch(logoPolri)).arrayBuffer();
+    const dokumentasi = await (await fetch(`http://localhost:8080/layanan/${row.id}/dokumentasi`)).arrayBuffer();
+    const dokumentasiSize = sizeOf(Buffer.from(dokumentasi));
+    const dokumentasiRatio = Math.min(120 / dokumentasiSize.width, 120 / dokumentasiSize.height);
+
+    const maxWidth = 300;
+    const maxHeight = 200;
+
+    const scale = Math.min(maxWidth / dokumentasiSize.width, maxHeight / dokumentasiSize.height);
+
     const date = new Date(row.tanggal!);
 
     let hari = "";
@@ -98,7 +109,20 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
         },
         sections: [
             {
-                properties: {},
+                properties: {
+                    page: {
+                        size: {
+                            width: convertMillimetersToTwip(210),
+                            height: convertMillimetersToTwip(297),
+                        },
+                        margin: {
+                            top: convertMillimetersToTwip(10),
+                            left: convertMillimetersToTwip(20),
+                            right: convertMillimetersToTwip(20),
+                            bottom: convertMillimetersToTwip(20),
+                        },
+                    }
+                },
                 children: [
                     new Table({
                         width: {
@@ -124,6 +148,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                 ],
                                                 alignment: "center",
                                             }),
+                                            new Paragraph("\n"),
                                             new Paragraph({
                                                 children: [
                                                     new TextRun({
@@ -200,15 +225,16 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                             firstLine: convertMillimetersToTwip(10),
                         }
                     }),
+                    new Paragraph("\n"),
                     new Paragraph({
                         children: [
                             new TextRun({
                                 text: [
-                                    `Nama: ${row.nama}`,
-                                    row.jenis === 1 ? "Laki-laki" : row.jenis === 2 ? "Perempuan" : "",
-                                    `Umur: ${row.umur} tahun`,
-                                    `Pekerjaan: ${row.pekerjaan}`,
-                                    `Alamat: ${row.alamat}`,
+                                    `Nama: ${row.nama},`,
+                                    (row.jenis === 1 ? "Laki-laki" : row.jenis === 2 ? "Perempuan" : "") + ",",
+                                    `Umur: ${row.umur} tahun,`,
+                                    `Pekerjaan: ${row.pekerjaan},`,
+                                    `Alamat: ${row.alamat},`,
                                     `No. Telp: ${row.telepon}`,
                                     `dan telah menerima pelayanan Kesehatan/ informasi / saran / permasalahan / keluhan dari masyarakat tersebut diatas, sebagai berikut:`,
                                 ].join(" "),
@@ -230,6 +256,12 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                 tableHeader: true,
                                 children: [
                                     new TableCell({
+                                        margins: {
+                                            top: convertMillimetersToTwip(2),
+                                            left: convertMillimetersToTwip(2),
+                                            right: convertMillimetersToTwip(2),
+                                            bottom: convertMillimetersToTwip(2),
+                                        },
                                         width: {
                                             size: 50,
                                             type: WidthType.PERCENTAGE,
@@ -248,6 +280,12 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                         ],
                                     }),
                                     new TableCell({
+                                        margins: {
+                                            top: convertMillimetersToTwip(2),
+                                            left: convertMillimetersToTwip(2),
+                                            right: convertMillimetersToTwip(2),
+                                            bottom: convertMillimetersToTwip(2),
+                                        },
                                         width: {
                                             size: 50,
                                             type: WidthType.PERCENTAGE,
@@ -270,6 +308,12 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                             new TableRow({
                                 children: [
                                     new TableCell({
+                                        margins: {
+                                            top: convertMillimetersToTwip(2),
+                                            left: convertMillimetersToTwip(2),
+                                            right: convertMillimetersToTwip(2),
+                                            bottom: convertMillimetersToTwip(2),
+                                        },
                                         width: {
                                             size: 50,
                                             type: WidthType.PERCENTAGE,
@@ -623,6 +667,12 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                         ],
                                     }),
                                     new TableCell({
+                                        margins: {
+                                            top: convertMillimetersToTwip(2),
+                                            left: convertMillimetersToTwip(2),
+                                            right: convertMillimetersToTwip(2),
+                                            bottom: convertMillimetersToTwip(2),
+                                        },
                                         width: {
                                             size: 50,
                                             type: WidthType.PERCENTAGE,
@@ -753,6 +803,143 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                     }),
                                                 ],
                                             })
+                                        ],
+                                    }),
+                                ],
+                            }),
+                        ],
+                    }),
+                    new Paragraph("\n"),
+                    new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: "Telah disampaikan solusi permasalahan Kesehatan/ himbauan / saran / tindak lanjut sebagai berikut :",
+                            }),
+                        ],
+                        alignment: "both",
+                        indent: {
+                            firstLine: convertMillimetersToTwip(10),
+                        }
+                    }),
+                    new Paragraph("\n"),
+                    new Table({
+                        width: {
+                            size: 100,
+                            type: WidthType.PERCENTAGE,
+                        },
+                        rows: [
+                            new TableRow({
+                                tableHeader: true,
+                                children: [
+                                    new TableCell({
+                                        margins: {
+                                            top: convertMillimetersToTwip(2),
+                                            left: convertMillimetersToTwip(2),
+                                            right: convertMillimetersToTwip(2),
+                                            bottom: convertMillimetersToTwip(2),
+                                        },
+                                        width: {
+                                            size: 50,
+                                            type: WidthType.PERCENTAGE,
+                                        },
+                                        verticalAlign: "center",
+                                        children: [
+                                            new Paragraph({
+                                                children: [
+                                                    new TextRun({
+                                                        text: "DOKUMENTASI",
+                                                        bold: true,
+                                                    }),
+                                                ],
+                                                alignment: "center",
+                                            }),
+                                        ],
+                                    }),
+                                    new TableCell({
+                                        margins: {
+                                            top: convertMillimetersToTwip(2),
+                                            left: convertMillimetersToTwip(2),
+                                            right: convertMillimetersToTwip(2),
+                                            bottom: convertMillimetersToTwip(2),
+                                        },
+                                        width: {
+                                            size: 50,
+                                            type: WidthType.PERCENTAGE,
+                                        },
+                                        verticalAlign: "center",
+                                        children: [
+                                            new Paragraph({
+                                                children: [
+                                                    new TextRun({
+                                                        text: [
+                                                            "SOLUSI PERMASALAHAN KESEHATAN / HIMBAUAN /",
+                                                            "SARAN / TINDAK LANJUT PETUGAS POLMAS YANKES PRESISI",
+                                                        ].join(" "),
+                                                        bold: true,
+                                                    }),
+                                                ],
+                                                alignment: "center",
+                                            }),
+                                        ],
+                                    }),
+                                ],
+                            }),
+                            new TableRow({
+                                children: [
+                                    new TableCell({
+                                        margins: {
+                                            top: convertMillimetersToTwip(2),
+                                            left: convertMillimetersToTwip(2),
+                                            right: convertMillimetersToTwip(2),
+                                            bottom: convertMillimetersToTwip(2),
+                                        },
+                                        width: {
+                                            size: 50,
+                                            type: WidthType.PERCENTAGE,
+                                        },
+                                        verticalAlign: "top",
+                                        children: [
+                                            new Paragraph("\n"),
+                                            new Paragraph({
+                                                children: [
+                                                    new ImageRun({
+                                                        data: dokumentasi,
+                                                        type: "jpg",
+                                                        transformation: {
+                                                            width: Math.round(dokumentasiSize.width * scale),
+                                                            height: Math.round(dokumentasiSize.height * scale),
+                                                        },
+                                                    }),
+                                                ],
+                                                alignment: "center",
+                                            }),
+                                            new Paragraph("\n"),
+                                        ],
+                                    }),
+                                    new TableCell({
+                                        margins: {
+                                            top: convertMillimetersToTwip(2),
+                                            left: convertMillimetersToTwip(2),
+                                            right: convertMillimetersToTwip(2),
+                                            bottom: convertMillimetersToTwip(2),
+                                        },
+                                        width: {
+                                            size: 50,
+                                            type: WidthType.PERCENTAGE,
+                                        },
+                                        verticalAlign: "top",
+                                        children: [
+                                            new Paragraph({
+                                                children: [
+                                                    new TextRun({
+                                                        text: row.solusi!,
+                                                    }),
+                                                ],
+                                                alignment: "both",
+                                                indent: {
+                                                    firstLine: convertMillimetersToTwip(10),
+                                                }
+                                            }),
                                         ],
                                     }),
                                 ],

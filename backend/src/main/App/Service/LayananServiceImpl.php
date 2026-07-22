@@ -111,7 +111,7 @@ class LayananServiceImpl implements LayananService
 	/**
 	 * @inheritDoc
 	 */
-	function update(LayananRequest $request, int $id): LayananResponse
+	function updateById(LayananRequest $request, int $id): LayananResponse
 	{
 		$entity = $this->layananRepository->selectById($id);
 		if ($entity == null || $entity->getIsDeleted()) throw new NotFoundException();

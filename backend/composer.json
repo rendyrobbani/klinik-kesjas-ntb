@@ -19,6 +19,7 @@
 	"require": {
 		"php": ">=8.5",
 		"ext-pdo": "*",
+		"ext-fileinfo": "*",
 		"firebase/php-jwt": "^7.1"
 	},
 	"require-dev": {

@@ -25,6 +25,8 @@ $router->post("/login", AuthController::class, "login");
 
 $router->get("/layanan", LayananController::class, "selectAll", [AuthMiddleware::class]);
 $router->get("/layanan/{id}", LayananController::class, "selectById", [AuthMiddleware::class]);
+//$router->get("/layanan/{id}/dokumentasi", LayananController::class, "imageById", [AuthMiddleware::class]);
+$router->get("/layanan/{id}/dokumentasi", LayananController::class, "imageById");
 $router->post("/layanan", LayananController::class, "create", [AuthMiddleware::class]);
 $router->post("/layanan/{id}", LayananController::class, "updateById", [AuthMiddleware::class]);
 $router->delete("/layanan/{id}", LayananController::class, "deleteById", [AuthMiddleware::class]);

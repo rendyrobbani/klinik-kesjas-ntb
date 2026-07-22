@@ -2,7 +2,9 @@
 
 namespace RendyRobbani\Klinik\Kesjas\NTB\App\Controller;
 
+use RendyRobbani\Klinik\Kesjas\NTB\App\Config\ApplicationConfig;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Context\ApplicationContext;
+use RendyRobbani\Klinik\Kesjas\NTB\App\Exception\NotFoundException;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Request\LayananRequest;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Service\LayananService;
 
@@ -41,6 +43,23 @@ class LayananController extends AbstractController
 	{
 		$response = $this->layananService->selectById($id);
 		$this->sendJson(200, "Ok", $response);
+	}
+
+	/**
+	 * @param int $id
+	 * @return void
+	 * @throws \Throwable
+	 */
+	public function imageById(int $id): void
+	{
+		$response = $this->layananService->selectById($id);
+		$path = ApplicationConfig::directory() . DIRECTORY_SEPARATOR . $response->dokumentasi;
+		if (!file_exists($path)) throw new NotFoundException();
+		$mime = mime_content_type($path);
+		header("Content-Type: $mime");
+		header("Content-Length: " . filesize($path));
+		header("Cache-Control: no-cache");
+		readfile($path);
 	}
 
 	/**
@@ -87,7 +106,7 @@ class LayananController extends AbstractController
 	public function updateById(int $id): void
 	{
 		$request = json_decode($_POST["data"], true);
-		$response = $this->layananService->update((new LayananRequest())
+		$response = $this->layananService->updateById((new LayananRequest())
 			->setNomor($request["nomor"] ?? null)
 			->setTanggal($request["tanggal"] ?? null)
 			->setNama($request["nama"] ?? null)

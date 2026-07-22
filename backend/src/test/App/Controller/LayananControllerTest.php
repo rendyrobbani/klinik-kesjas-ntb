@@ -122,7 +122,7 @@ class LayananControllerTest extends TestCase
 
 		$this->layananService
 			->expects($this->once())
-			->method("update")
+			->method("updateById")
 			->with(
 				$this->isInstanceOf(
 					\RendyRobbani\Klinik\Kesjas\NTB\App\Request\LayananRequest::class
