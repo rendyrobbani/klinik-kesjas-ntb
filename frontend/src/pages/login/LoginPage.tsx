@@ -5,6 +5,7 @@ import LoginSVG from "../../assets/login.svg?react";
 import ProgressActivitySVG from "../../assets/progress_activity.svg?react";
 import {useApplicationContext} from "../../hook/useApplicationContext.tsx";
 import {useNavigate} from "react-router-dom";
+import {getApiHost} from "../../hook/config.ts";
 
 export const LoginPage = () => {
 
@@ -29,7 +30,7 @@ export const LoginPage = () => {
         setShowLoading(true);
 
         try {
-            const url = "http://localhost:8080/api/login"
+            const url = `${getApiHost()}/api/login`
             const opt: RequestInit = {
                 method: "POST",
                 credentials: "include",

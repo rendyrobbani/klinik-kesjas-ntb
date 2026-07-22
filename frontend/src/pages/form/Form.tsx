@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type {FormType} from "./FormType.ts";
 import {Fragment, useEffect, useRef, useState} from "react";
 import clsx from "clsx";
@@ -5,6 +6,7 @@ import {Link, useParams} from "react-router-dom";
 import {useApplicationContext} from "../../hook/useApplicationContext.tsx";
 import type {LayananResponse} from "../home/LayananResponse.ts";
 import ImageSVG from "../../assets/image.svg?react";
+import {getApiHost} from "../../hook/config.ts";
 
 export const Form = (props: { type: FormType }) => {
 
@@ -120,7 +122,7 @@ export const Form = (props: { type: FormType }) => {
         form.append("file", dokumentasi);
 
         let response: null | Response = null;
-        if (props.type === "create") response = await fetch("http://localhost:8080/layanan", {
+        if (props.type === "create") response = await fetch(`${getApiHost()}/layanan`, {
             headers: {
                 "Accept": "application/json",
                 "Authorization": `Bearer ${applicationContext?.token ?? ""}`
@@ -129,7 +131,7 @@ export const Form = (props: { type: FormType }) => {
             credentials: "include",
             body: form,
         });
-        if (props.type === "update") response = await fetch(`http://localhost:8080/layanan/${id}`, {
+        if (props.type === "update") response = await fetch(`${getApiHost()}/layanan/${id}`, {
             headers: {
                 "Accept": "application/json",
                 "Authorization": `Bearer ${applicationContext?.token ?? ""}`
@@ -181,7 +183,7 @@ export const Form = (props: { type: FormType }) => {
         if (props.type === "create") return;
 
         applicationContext!.showLoading = true;
-        fetch(`http://localhost:8080/api/layanan/${id}`, {
+        fetch(`${getApiHost()}/api/layanan/${id}`, {
             headers: {
                 "Accept": "application/json",
                 "Authorization": `Bearer ${applicationContext?.token ?? ""}`

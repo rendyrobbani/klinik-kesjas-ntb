@@ -1,0 +1,11 @@
+RewriteEngine On
+
+# API
+RewriteRule ^api/?(.*)$ index.php [QSA,L]
+
+# Jika file ada (assets)
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# React SPA
+RewriteRule ^ index.html [L]

@@ -2,4 +2,8 @@
 .*/
 .DS_Store
 backend/resources/application.json
+backend/public/*
+!backend/public/index.php
+!backend/public/.htaccess
+!backend/public/nginx
 vendor/

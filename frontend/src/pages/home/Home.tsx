@@ -12,6 +12,7 @@ import {SearchUtil} from "../../util/SearchUtil.ts";
 import {Dialog} from "../../components/dialog/Dialog.tsx";
 import {Link} from "react-router-dom";
 import {printLayanan} from "../../event/printLayanan.ts";
+import {getApiHost} from "../../hook/config.ts";
 
 export const Home = () => {
 
@@ -49,7 +50,7 @@ export const Home = () => {
                         try {
                             applicationContext!.showLoading = true;
 
-                            fetch(`http://localhost:8080/api/layanan/${row.id}`, {
+                            fetch(`${getApiHost()}/api/layanan/${row.id}`, {
                                 headers: {
                                     "Accept": "application/json",
                                     "Authorization": `Bearer ${applicationContext?.token ?? ""}`
@@ -95,7 +96,7 @@ export const Home = () => {
     useEffect(() => {
         if (listLayanan != null) return;
         applicationContext!.showLoading = true;
-        fetch("http://localhost:8080/api/layanan", {
+        fetch(`${getApiHost()}/api/layanan`, {
             headers: {
                 "Accept": "application/json",
                 "Authorization": `Bearer ${applicationContext?.token ?? ""}`

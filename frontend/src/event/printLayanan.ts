@@ -1,8 +1,9 @@
 import {BorderStyle, Document, ImageRun, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType} from "docx";
 import type {LayananResponse} from "../pages/home/LayananResponse.ts";
-import logoPolri from "../assets/logo-polri.png";
+import logoPolri from "../assets/logo-polri-bw.webp";
 import sizeOf from "image-size";
 import {Buffer} from "buffer";
+import {getApiHost} from "../hook/config.ts";
 
 const convertMillimetersToTwip = (mm: number) => {
     return mm * 56.7;
@@ -17,14 +18,16 @@ const noborder = () => ({
 
 export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
     const logo = await (await fetch(logoPolri)).arrayBuffer();
-    const dokumentasi = await (await fetch(`http://localhost:8080/layanan/${row.id}/dokumentasi`)).arrayBuffer();
+    const logoSize = sizeOf(Buffer.from(logo));
+    const logoScale = Math.min(100 / logoSize.width, 100 / logoSize.height);
+
+    const dokumentasi = await (await fetch(`${getApiHost()}/layanan/${row.id}/dokumentasi`)).arrayBuffer();
     const dokumentasiSize = sizeOf(Buffer.from(dokumentasi));
-    const dokumentasiRatio = Math.min(120 / dokumentasiSize.width, 120 / dokumentasiSize.height);
 
     const maxWidth = 300;
     const maxHeight = 200;
 
-    const scale = Math.min(maxWidth / dokumentasiSize.width, maxHeight / dokumentasiSize.height);
+    const documentasiScale = Math.min(maxWidth / dokumentasiSize.width, maxHeight / dokumentasiSize.height);
 
     const date = new Date(row.tanggal!);
 
@@ -101,10 +104,15 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
             default: {
                 document: {
                     run: {
-                        font: "Arial",
-                        size: 20,
+                        font: "Calibri",
+                        size: 24,
+                    },
+                    paragraph: {
+                        spacing: {
+                            line: 240 * 1,
+                        }
                     }
-                }
+                },
             }
         },
         sections: [
@@ -126,13 +134,21 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                 children: [
                     new Table({
                         width: {
-                            size: 100,
-                            type: WidthType.PERCENTAGE,
+                            size: convertMillimetersToTwip(170+20),
+                            type: WidthType.DXA,
+                        },
+                        indent: {
+                            type: WidthType.DXA,
+                            size: -convertMillimetersToTwip(20),
                         },
                         rows: [
                             new TableRow({
                                 children: [
                                     new TableCell({
+                                        width: {
+                                            size: 50,
+                                            type: WidthType.PERCENTAGE
+                                        },
                                         borders: noborder(),
                                         children: [
                                             new Paragraph({
@@ -141,19 +157,17 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                         data: logo,
                                                         type: "png",
                                                         transformation: {
-                                                            width: 75,
-                                                            height: 75
+                                                            width: Math.round(logoSize.width * logoScale),
+                                                            height: Math.round(logoSize.height * logoScale),
                                                         },
                                                     }),
                                                 ],
                                                 alignment: "center",
                                             }),
-                                            new Paragraph("\n"),
                                             new Paragraph({
                                                 children: [
                                                     new TextRun({
                                                         text: "KEPOLISIAN NEGARA REPUBLIK INDONESIA",
-                                                        bold: true,
                                                     })
                                                 ],
                                                 alignment: "center",
@@ -162,7 +176,6 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                 children: [
                                                     new TextRun({
                                                         text: "DAERAH NUSA TENGGARA BARAT",
-                                                        bold: true,
                                                     })
                                                 ],
                                                 alignment: "center",
@@ -171,7 +184,6 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                 children: [
                                                     new TextRun({
                                                         text: "BIDANG KEDOKTERAN DAN KESEHATAN",
-                                                        bold: true,
                                                         underline: {
                                                             type: "single",
                                                         }
@@ -182,6 +194,10 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                         ],
                                     }),
                                     new TableCell({
+                                        width: {
+                                            size: 50,
+                                            type: WidthType.PERCENTAGE
+                                        },
                                         borders: noborder(),
                                         children: [
                                             new Paragraph({
@@ -195,23 +211,24 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                         ],
                     }),
                     new Paragraph("\n"),
-                    new Paragraph("\n"),
                     new Paragraph({
                         children: [
                             new TextRun({
                                 text: "LEMBAR KUNJUNGAN \"POLMAS PELAYANAN KESEHATAN GRATIS PRESISI POLDA NTB\"",
                                 bold: true,
+                                underline: {
+                                    type: "single",
+                                }
                             })
                         ],
                         alignment: "center",
                     }),
                     new Paragraph("\n"),
-                    new Paragraph("\n"),
                     new Paragraph({
                         children: [
                             new TextRun({
                                 text: [
-                                    `Pada hari ini ${hari}, ${date.getDate()} ${bulan} ${date.getFullYear()}. Pukul:${date.getHours()}:${date.getMinutes()}Wita`,
+                                    `Pada hari ini ${hari}, ${date.getDate()} ${bulan} ${date.getFullYear()} Pukul:${date.getHours()}:${date.getMinutes()} Wita,`,
                                     `Berdasarkan Surat Perintah Kapolda NTB Nomor: Sprin/818/VI/KEP./2026, tanggal 10 Juni 2026`,
                                     `tentang kegiatan Polmas Pelayanan Kesehatan Gratis Presisi Polda NTB dan Polres/ta sebagai`,
                                     `pengemban fungsi dan peran pemolisian masyarakat (POLMAS). Telah melakukan pelayanan`,
@@ -220,32 +237,89 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                 ].join(" "),
                             }),
                         ],
+                        spacing: {line: 240 * 1.15},
                         alignment: "both",
                         indent: {
                             firstLine: convertMillimetersToTwip(10),
                         }
                     }),
-                    new Paragraph("\n"),
+                    new Paragraph({
+                        tabStops: [
+                            {
+                                type: "left",
+                                position: convertMillimetersToTwip(20),
+                            }
+                        ],
+                        indent: {
+                            hanging: convertMillimetersToTwip(25),
+                            left: convertMillimetersToTwip(25),
+                        },
+                        children: [
+                            new TextRun({
+                                text: [
+                                    `Nama\t :\t${row.nama},`,
+                                    (row.jenis === 1 ? "Lk" : row.jenis === 2 ? "Pr" : "") + ",",
+                                    `Umur: ${row.umur} tahun,`,
+                                    `Pekerjaan: ${row.pekerjaan}.`,
+                                ].join(" "),
+                            })
+                        ],
+                        spacing: {line: 240 * 1.15},
+                        alignment: "both",
+                    }),
+                    new Paragraph({
+                        tabStops: [
+                            {
+                                type: "left",
+                                position: convertMillimetersToTwip(20),
+                            }
+                        ],
+                        indent: {
+                            hanging: convertMillimetersToTwip(25),
+                            left: convertMillimetersToTwip(25),
+                        },
+                        children: [
+                            new TextRun({
+                                text: [
+                                    `Alamat\t:\t${row.alamat},`,
+                                ].join(" "),
+                            })
+                        ],
+                        spacing: {line: 240 * 1.15},
+                        alignment: "both",
+                    }),
+                    new Paragraph({
+                        tabStops: [
+                            {
+                                type: "left",
+                                position: convertMillimetersToTwip(20),
+                            }
+                        ],
+                        indent: {
+                            hanging: convertMillimetersToTwip(25),
+                            left: convertMillimetersToTwip(25),
+                        },
+                        children: [
+                            new TextRun({
+                                text: [
+                                    `No. Telp\t:\t${row.telepon}`,
+                                ].join(" "),
+                            })
+                        ],
+                        spacing: {line: 240 * 1.15},
+                        alignment: "both",
+                    }),
                     new Paragraph({
                         children: [
                             new TextRun({
                                 text: [
-                                    `Nama: ${row.nama},`,
-                                    (row.jenis === 1 ? "Laki-laki" : row.jenis === 2 ? "Perempuan" : "") + ",",
-                                    `Umur: ${row.umur} tahun,`,
-                                    `Pekerjaan: ${row.pekerjaan},`,
-                                    `Alamat: ${row.alamat},`,
-                                    `No. Telp: ${row.telepon}`,
                                     `dan telah menerima pelayanan Kesehatan/ informasi / saran / permasalahan / keluhan dari masyarakat tersebut diatas, sebagai berikut:`,
                                 ].join(" "),
                             })
                         ],
+                        spacing: {line: 240 * 1.15},
                         alignment: "both",
-                        indent: {
-                            firstLine: convertMillimetersToTwip(10),
-                        }
                     }),
-                    new Paragraph("\n"),
                     new Table({
                         width: {
                             size: 100,
@@ -272,7 +346,6 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                 children: [
                                                     new TextRun({
                                                         text: "ASPEK",
-                                                        bold: true,
                                                     }),
                                                 ],
                                                 alignment: "center",
@@ -296,7 +369,6 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                 children: [
                                                     new TextRun({
                                                         text: "PERMASALAHAN KESEHATAN / INFORMASI / SARAN / KELUHAN MASYARAKAT",
-                                                        bold: true,
                                                     }),
                                                 ],
                                                 alignment: "center",
@@ -318,7 +390,6 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                             size: 50,
                                             type: WidthType.PERCENTAGE,
                                         },
-                                        verticalAlign: "center",
                                         children: [
                                             new Table({
                                                 width: {
@@ -330,7 +401,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                         children: [
                                                             new TableCell({
                                                                 width: {
-                                                                    size: 55,
+                                                                    size: 60,
                                                                     type: WidthType.PERCENTAGE,
                                                                 },
                                                                 borders: noborder(),
@@ -356,7 +427,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                             }),
                                                             new TableCell({
                                                                 width: {
-                                                                    size: 45,
+                                                                    size: 40,
                                                                     type: WidthType.PERCENTAGE,
                                                                 },
                                                                 borders: noborder(),
@@ -386,7 +457,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                         children: [
                                                             new TableCell({
                                                                 width: {
-                                                                    size: 55,
+                                                                    size: 60,
                                                                     type: WidthType.PERCENTAGE,
                                                                 },
                                                                 borders: noborder(),
@@ -412,7 +483,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                             }),
                                                             new TableCell({
                                                                 width: {
-                                                                    size: 45,
+                                                                    size: 40,
                                                                     type: WidthType.PERCENTAGE,
                                                                 },
                                                                 borders: noborder(),
@@ -442,7 +513,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                         children: [
                                                             new TableCell({
                                                                 width: {
-                                                                    size: 55,
+                                                                    size: 60,
                                                                     type: WidthType.PERCENTAGE,
                                                                 },
                                                                 borders: noborder(),
@@ -468,7 +539,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                             }),
                                                             new TableCell({
                                                                 width: {
-                                                                    size: 45,
+                                                                    size: 40,
                                                                     type: WidthType.PERCENTAGE,
                                                                 },
                                                                 borders: noborder(),
@@ -498,7 +569,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                         children: [
                                                             new TableCell({
                                                                 width: {
-                                                                    size: 55,
+                                                                    size: 60,
                                                                     type: WidthType.PERCENTAGE,
                                                                 },
                                                                 borders: noborder(),
@@ -524,7 +595,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                             }),
                                                             new TableCell({
                                                                 width: {
-                                                                    size: 45,
+                                                                    size: 40,
                                                                     type: WidthType.PERCENTAGE,
                                                                 },
                                                                 borders: noborder(),
@@ -554,7 +625,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                         children: [
                                                             new TableCell({
                                                                 width: {
-                                                                    size: 55,
+                                                                    size: 60,
                                                                     type: WidthType.PERCENTAGE,
                                                                 },
                                                                 borders: noborder(),
@@ -580,7 +651,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                             }),
                                                             new TableCell({
                                                                 width: {
-                                                                    size: 45,
+                                                                    size: 40,
                                                                     type: WidthType.PERCENTAGE,
                                                                 },
                                                                 borders: noborder(),
@@ -610,7 +681,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                         children: [
                                                             new TableCell({
                                                                 width: {
-                                                                    size: 55,
+                                                                    size: 60,
                                                                     type: WidthType.PERCENTAGE,
                                                                 },
                                                                 borders: noborder(),
@@ -636,7 +707,7 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                             }),
                                                             new TableCell({
                                                                 width: {
-                                                                    size: 45,
+                                                                    size: 40,
                                                                     type: WidthType.PERCENTAGE,
                                                                 },
                                                                 borders: noborder(),
@@ -809,19 +880,15 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                             }),
                         ],
                     }),
-                    new Paragraph("\n"),
                     new Paragraph({
                         children: [
                             new TextRun({
-                                text: "Telah disampaikan solusi permasalahan Kesehatan/ himbauan / saran / tindak lanjut sebagai berikut :",
+                                text: "Telah disampaikan solusi permasalahan Kesehatan/himbauan/saran/tindak lanjut sebagai berikut:",
                             }),
                         ],
+                        spacing: {line: 240 * 1.15},
                         alignment: "both",
-                        indent: {
-                            firstLine: convertMillimetersToTwip(10),
-                        }
                     }),
-                    new Paragraph("\n"),
                     new Table({
                         width: {
                             size: 100,
@@ -848,7 +915,6 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                 children: [
                                                     new TextRun({
                                                         text: "DOKUMENTASI",
-                                                        bold: true,
                                                     }),
                                                 ],
                                                 alignment: "center",
@@ -875,7 +941,6 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                                             "SOLUSI PERMASALAHAN KESEHATAN / HIMBAUAN /",
                                                             "SARAN / TINDAK LANJUT PETUGAS POLMAS YANKES PRESISI",
                                                         ].join(" "),
-                                                        bold: true,
                                                     }),
                                                 ],
                                                 alignment: "center",
@@ -899,21 +964,19 @@ export const printLayanan = async (row: LayananResponse): Promise<Blob> => {
                                         },
                                         verticalAlign: "top",
                                         children: [
-                                            new Paragraph("\n"),
                                             new Paragraph({
                                                 children: [
                                                     new ImageRun({
                                                         data: dokumentasi,
                                                         type: "jpg",
                                                         transformation: {
-                                                            width: Math.round(dokumentasiSize.width * scale),
-                                                            height: Math.round(dokumentasiSize.height * scale),
+                                                            width: Math.round(dokumentasiSize.width * documentasiScale),
+                                                            height: Math.round(dokumentasiSize.height * documentasiScale),
                                                         },
                                                     }),
                                                 ],
                                                 alignment: "center",
                                             }),
-                                            new Paragraph("\n"),
                                         ],
                                     }),
                                     new TableCell({
