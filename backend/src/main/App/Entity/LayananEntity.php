@@ -134,6 +134,8 @@ class LayananEntity
 	 */
 	private string|null $solusi;
 
+	private string|null $dokumentasi;
+
 	/**
 	 * @var string|null
 	 */
@@ -644,6 +646,17 @@ class LayananEntity
 	public function setSolusi(string|null $solusi): LayananEntity
 	{
 		$this->solusi = $solusi;
+		return $this;
+	}
+
+	public function getDokumentasi(): string|null
+	{
+		return $this->dokumentasi;
+	}
+
+	public function setDokumentasi(string|null $dokumentasi): LayananEntity
+	{
+		$this->dokumentasi = $dokumentasi;
 		return $this;
 	}
 

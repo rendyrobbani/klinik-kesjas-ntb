@@ -48,6 +48,10 @@ class LayananRequest
 
 	private string|null $solusi;
 
+	private mixed $dokumentasi;
+
+	private string|null $dokumentasiExt;
+
 	public function validate(): array
 	{
 		$errors = [];
@@ -61,6 +65,8 @@ class LayananRequest
 		if (!isset($this->telepon) || $this->telepon == null || trim($this->telepon) == "") $errors["Telepon"] = ["tidak boleh kosong"];
 		if (!isset($this->permasalahan) || $this->permasalahan == null || trim($this->permasalahan) == "") $errors["Permasalahan"] = ["tidak boleh kosong"];
 		if (!isset($this->solusi) || $this->solusi == null || trim($this->solusi) == "") $errors["Solusi"] = ["tidak boleh kosong"];
+		if (!isset($this->dokumentasi) || $this->dokumentasi == null) $errors["Dokumentasi"] = ["tidak boleh kosong"];
+		if (!isset($this->dokumentasiExt) || $this->dokumentasiExt == null || trim($this->dokumentasiExt) == "") $errors["Dokumentasi"] = ["tidak boleh kosong"];
 		return $errors;
 	}
 
@@ -303,6 +309,28 @@ class LayananRequest
 	public function setSolusi(string|null $solusi): LayananRequest
 	{
 		$this->solusi = $solusi;
+		return $this;
+	}
+
+	public function getDokumentasi(): mixed
+	{
+		return $this->dokumentasi;
+	}
+
+	public function setDokumentasi(mixed $dokumentasi): LayananRequest
+	{
+		$this->dokumentasi = $dokumentasi;
+		return $this;
+	}
+
+	public function getDokumentasiExt(): string|null
+	{
+		return $this->dokumentasiExt;
+	}
+
+	public function setDokumentasiExt(string|null $dokumentasiExt): LayananRequest
+	{
+		$this->dokumentasiExt = $dokumentasiExt;
 		return $this;
 	}
 }

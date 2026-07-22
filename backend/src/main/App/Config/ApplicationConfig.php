@@ -14,6 +14,8 @@ class ApplicationConfig
 	 */
 	private SecurityConfig $security;
 
+	private string $directory;
+
 	private function __construct()
 	{
 	}
@@ -48,6 +50,9 @@ class ApplicationConfig
 
 			if (!isset($contents->security)) throw new \Exception("Configuration file is invalid");
 			self::$instance->security = new SecurityConfig($contents->security->secretKey, $contents->security->expired);
+
+			if (!isset($contents->directory)) throw new \Exception("Configuration file is invalid");
+			self::$instance->directory = $contents->directory;
 		}
 		return self::$instance;
 	}
@@ -68,5 +73,14 @@ class ApplicationConfig
 	public static function security(): SecurityConfig
 	{
 		return self::instance()->security;
+	}
+
+	/**
+	 * @return string
+	 * @throws \Exception
+	 */
+	public static function directory(): string
+	{
+		return self::instance()->directory;
 	}
 }

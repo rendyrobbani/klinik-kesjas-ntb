@@ -42,6 +42,7 @@ readonly class LayananRepositoryImpl implements LayananRepository
 			->setIsLainLain($row["is_lain_lain"])
 			->setPermasalahan($row["permasalahan"])
 			->setSolusi($row["solusi"])
+			->setDokumentasi($row["dokumentasi"])
 			->setIdPetugas($row["id_petugas"])
 			->setNamaPetugas($row["nama_petugas"])
 			->setCreatedAt($row["created_at"])
@@ -94,8 +95,8 @@ readonly class LayananRepositoryImpl implements LayananRepository
 	function save(LayananEntity $layanan): LayananEntity
 	{
 		$sql = <<<SQL
-		insert into layanan (id, nomor, tanggal, nomor_surat, tanggal_surat, komunitas, nama, jenis, umur, pekerjaan, alamat, telepon, is_pelayanan, is_ideologi, is_politik, is_sosial, is_budaya, is_agama, is_kamtibmas, is_kriminalitas, is_tibcar_lantas, is_prilaku_polri, is_yan_polri, is_lain_lain, permasalahan, solusi, id_petugas, created_at, created_by, updated_at, updated_by, is_deleted, deleted_at, deleted_by)
-		values (:id, :nomor, :tanggal, :nomor_surat, :tanggal_surat, :komunitas, :nama, :jenis, :umur, :pekerjaan, :alamat, :telepon, :is_pelayanan, :is_ideologi, :is_politik, :is_sosial, :is_budaya, :is_agama, :is_kamtibmas, :is_kriminalitas, :is_tibcar_lantas, :is_prilaku_polri, :is_yan_polri, :is_lain_lain, :permasalahan, :solusi, :id_petugas, :created_at, :created_by, :updated_at, :updated_by, :is_deleted, :deleted_at, :deleted_by)
+		insert into layanan (id, nomor, tanggal, nomor_surat, tanggal_surat, komunitas, nama, jenis, umur, pekerjaan, alamat, telepon, is_pelayanan, is_ideologi, is_politik, is_sosial, is_budaya, is_agama, is_kamtibmas, is_kriminalitas, is_tibcar_lantas, is_prilaku_polri, is_yan_polri, is_lain_lain, permasalahan, solusi, dokumentasi, id_petugas, created_at, created_by, updated_at, updated_by, is_deleted, deleted_at, deleted_by)
+		values (:id, :nomor, :tanggal, :nomor_surat, :tanggal_surat, :komunitas, :nama, :jenis, :umur, :pekerjaan, :alamat, :telepon, :is_pelayanan, :is_ideologi, :is_politik, :is_sosial, :is_budaya, :is_agama, :is_kamtibmas, :is_kriminalitas, :is_tibcar_lantas, :is_prilaku_polri, :is_yan_polri, :is_lain_lain, :permasalahan, :solusi, :dokumentasi, :id_petugas, :created_at, :created_by, :updated_at, :updated_by, :is_deleted, :deleted_at, :deleted_by)
 		on duplicate key update nomor            = :nomor
 		                      , tanggal          = :tanggal
 		                      , nomor_surat      = :nomor_surat
@@ -121,6 +122,7 @@ readonly class LayananRepositoryImpl implements LayananRepository
 		                      , is_lain_lain     = :is_lain_lain
 		                      , permasalahan     = :permasalahan
 		                      , solusi           = :solusi
+		                      , dokumentasi      = :dokumentasi
 		                      , id_petugas       = :id_petugas
 		                      , created_at       = :created_at
 		                      , created_by       = :created_by
@@ -161,6 +163,7 @@ readonly class LayananRepositoryImpl implements LayananRepository
 		$statement->bindValue("is_lain_lain", $layanan->getIsLainLain(), \PDO::PARAM_BOOL);
 		$statement->bindValue("permasalahan", $layanan->getPermasalahan());
 		$statement->bindValue("solusi", $layanan->getSolusi());
+		$statement->bindValue("dokumentasi", $layanan->getDokumentasi());
 		$statement->bindValue("id_petugas", $layanan->getIdPetugas());
 		$statement->bindValue("created_at", $layanan->getCreatedAt());
 		$statement->bindValue("created_by", $layanan->getCreatedBy());

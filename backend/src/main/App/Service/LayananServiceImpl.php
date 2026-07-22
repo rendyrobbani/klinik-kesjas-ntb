@@ -2,6 +2,7 @@
 
 namespace RendyRobbani\Klinik\Kesjas\NTB\App\Service;
 
+use RendyRobbani\Klinik\Kesjas\NTB\App\Config\ApplicationConfig;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Context\ApplicationContext;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Entity\LayananEntity;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Exception\BadRequestException;
@@ -52,6 +53,10 @@ class LayananServiceImpl implements LayananService
 		$errors = $request->validate();
 		if (sizeof($errors) > 0) throw new BadRequestException($errors);
 
+		if (!file_exists(ApplicationConfig::directory())) mkdir(ApplicationConfig::directory(), 0777, true);
+		$fileName = implode("-", ["dokumentasi", date_format(new \DateTimeImmutable(), "Ymd-His")]) . "." . $request->getDokumentasiExt();
+		move_uploaded_file($request->getDokumentasi()["tmp_name"], ApplicationConfig::directory() . DIRECTORY_SEPARATOR . $fileName);
+
 		try {
 			$this->connection->beginTransaction();
 
@@ -89,6 +94,7 @@ class LayananServiceImpl implements LayananService
 			$entity->setIsDeleted(false);
 			$entity->setDeletedAt(null);
 			$entity->setDeletedBy(null);
+			$entity->setDokumentasi($fileName);
 
 			$entity = $this->layananRepository->save($entity);
 
@@ -97,6 +103,7 @@ class LayananServiceImpl implements LayananService
 			return LayananResponse::fromEntity($this->layananRepository->selectById($entity->getId()));
 		} catch (\Throwable $exception) {
 			$this->connection->rollBack();
+			unlink(ApplicationConfig::directory() . DIRECTORY_SEPARATOR . $fileName);
 			throw $exception;
 		}
 	}
@@ -111,6 +118,10 @@ class LayananServiceImpl implements LayananService
 
 		$errors = $request->validate();
 		if (sizeof($errors) > 0) throw new BadRequestException($errors);
+
+		if (!file_exists(ApplicationConfig::directory())) mkdir(ApplicationConfig::directory(), 0777, true);
+		$fileName = implode("-", ["dokumentasi", date_format(new \DateTimeImmutable(), "Ymd-His")]) . "." . $request->getDokumentasiExt();
+		move_uploaded_file($request->getDokumentasi()["tmp_name"], ApplicationConfig::directory() . DIRECTORY_SEPARATOR . $fileName);
 
 		try {
 			$this->connection->beginTransaction();
@@ -145,6 +156,7 @@ class LayananServiceImpl implements LayananService
 			$entity->setIsDeleted(false);
 			$entity->setDeletedAt(null);
 			$entity->setDeletedBy(null);
+			$entity->setDokumentasi($fileName);
 
 			$entity = $this->layananRepository->save($entity);
 			$this->connection->commit();

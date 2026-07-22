@@ -6,6 +6,7 @@
 	},
 	"security": {
 		"secretKey": "G71F94Yqys0B0MKLYtcLh3BR4YhxXXBisuZQHuakHaR5X84Aued31NV7N42PG4YF",
-		"expired": 1
-	}
+		"expired": 60
+	},
+	"directory": "/Users/rendyrobbani/Git/klinik-kesjas-ntb/.test"
 }

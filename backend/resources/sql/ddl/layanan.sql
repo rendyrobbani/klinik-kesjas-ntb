@@ -25,6 +25,7 @@ create or replace table layanan (
     is_lain_lain     bit,
     permasalahan     varchar(1020),
     solusi           varchar(1020),
+    dokumentasi      varchar(1020),
     id_petugas       varchar(8),
     created_at       datetime,
     created_by       varchar(8),

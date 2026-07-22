@@ -49,7 +49,7 @@ class LayananController extends AbstractController
 	 */
 	public function create(): void
 	{
-		$request = json_decode(file_get_contents('php://input'), true);
+		$request = json_decode($_POST["data"], true);
 		$response = $this->layananService->create((new LayananRequest())
 			->setNomor($request["nomor"] ?? null)
 			->setTanggal($request["tanggal"] ?? null)
@@ -73,6 +73,8 @@ class LayananController extends AbstractController
 			->setIsLainLain($request["isLainLain"] ?? false)
 			->setPermasalahan($request["permasalahan"] ?? null)
 			->setSolusi($request["solusi"] ?? null)
+			->setDokumentasiExt($request["dokumentasiExt"] ?? null)
+			->setDokumentasi($_FILES["file"] ?? null)
 		);
 		$this->sendJson(200, "Ok", $response);
 	}
@@ -82,10 +84,11 @@ class LayananController extends AbstractController
 	 * @return void
 	 * @throws \Throwable
 	 */
-	public function update(int $id): void
+	public function updateById(int $id): void
 	{
-		$request = json_decode(file_get_contents('php://input'), true);
+		$request = json_decode($_POST["data"], true);
 		$response = $this->layananService->update((new LayananRequest())
+			->setNomor($request["nomor"] ?? null)
 			->setTanggal($request["tanggal"] ?? null)
 			->setNama($request["nama"] ?? null)
 			->setJenis($request["jenis"] ?? null)
@@ -106,7 +109,9 @@ class LayananController extends AbstractController
 			->setIsYanPolri($request["isYanPolri"] ?? false)
 			->setIsLainLain($request["isLainLain"] ?? false)
 			->setPermasalahan($request["permasalahan"] ?? null)
-			->setSolusi($request["solusi"] ?? null),
+			->setSolusi($request["solusi"] ?? null)
+			->setDokumentasiExt($request["dokumentasiExt"] ?? null)
+			->setDokumentasi($_FILES["file"] ?? null),
 			$id
 		);
 		$this->sendJson(200, "Ok", $response);

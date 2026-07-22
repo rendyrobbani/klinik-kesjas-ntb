@@ -1,14 +1,14 @@
 import type {FormType} from "./FormType.ts";
 import {Fragment, useEffect, useRef, useState} from "react";
 import clsx from "clsx";
-import {Link, useNavigate, useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import {useApplicationContext} from "../../hook/useApplicationContext.tsx";
 import type {LayananResponse} from "../home/LayananResponse.ts";
+import ImageSVG from "../../assets/image.svg?react";
 
 export const Form = (props: { type: FormType }) => {
 
     const applicationContext = useApplicationContext();
-    const navigate = useNavigate();
 
     const {id: _id} = useParams();
     const id = Number(_id);
@@ -81,8 +81,13 @@ export const Form = (props: { type: FormType }) => {
     const solusiRef = useRef<null | HTMLInputElement>(null);
     const [solusiError, setSolusiError] = useState(false);
 
+    const dokumentasiRef = useRef<null | HTMLInputElement>(null);
+    const [dokumentasiError, setDokumentasiError] = useState(false);
+
     const handleSubmit = async () => {
         applicationContext!.showLoading = true;
+
+        const dokumentasi = (dokumentasiRef.current?.files ?? [])[0] ?? null;
 
         const request = {
             nomor: Number(nomorRef.current?.value ?? null),
@@ -107,50 +112,67 @@ export const Form = (props: { type: FormType }) => {
             isLainLain: lainLainRef.current?.checked ?? false,
             permasalahan: permasalahanRef.current?.value ?? null,
             solusi: solusiRef.current?.value ?? null,
+            dokumentasiExt: dokumentasi == null ? null : dokumentasi.name.substring(dokumentasi.name.lastIndexOf(".") + 1),
         };
 
-        const response = await fetch("http://localhost:8080/layanan", {
+        const form = new FormData();
+        form.append("data", JSON.stringify(request));
+        form.append("file", dokumentasi);
+
+        let response: null | Response = null;
+        if (props.type === "create") response = await fetch("http://localhost:8080/layanan", {
             headers: {
                 "Accept": "application/json",
                 "Authorization": `Bearer ${applicationContext?.token ?? ""}`
             },
             method: "POST",
             credentials: "include",
-            body: JSON.stringify(request),
+            body: form,
+        });
+        if (props.type === "update") response = await fetch(`http://localhost:8080/layanan/${id}`, {
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${applicationContext?.token ?? ""}`
+            },
+            method: "POST",
+            credentials: "include",
+            body: form,
         });
 
-        if (response.ok) {
-            applicationContext!.openSuccessModal(`Data pelayanan a.n. <b>${namaRef.current!.value!}</b> berhasil disimpan`);
-            window.location = "/";
-        } else {
-            if (response.status === 401) {
-                applicationContext!.showLoading = false;
-                applicationContext!.token = null;
-                window.location = "/login";
-                return;
-            } else if (response.status === 400) {
-                applicationContext!.showLoading = false;
-                const body: null | undefined | Record<string, string[]> = await response.json();
-                if (!!body) {
-                    Object.entries(body).forEach(([field, messages]) => {
-                        if (field === "Nomor Kunjungan") setNomorError(true);
-                        if (field === "Tanggal") setTanggalError(true);
-                        if (field === "Nama") setNamaError(true);
-                        if (field === "Jenis") setJenisError(true);
-                        if (field === "Umur") setUmurError(true);
-                        if (field === "Pekerjaan") setPekerjaanError(true);
-                        if (field === "Alamat") setAlamatError(true);
-                        if (field === "Telepon") setTeleponError(true);
-                        if (field === "Permasalahan") setPermasalahanError(true);
-                        if (field === "Solusi") setSolusiError(true);
-                        messages.forEach(message => {
-                            applicationContext?.openErrorModal(`<b>${field}</b> : ${message}`);
-                        })
-                    })
-                }
+        if (!!response) {
+            if (response.ok) {
+                applicationContext!.openSuccessModal(`Data pelayanan a.n. <b>${namaRef.current!.value!}</b> berhasil disimpan`);
+                window.location = "/";
             } else {
-                applicationContext!.showLoading = false;
-                applicationContext?.openErrorModal(`Terjadi kesalahan`);
+                if (response.status === 401) {
+                    applicationContext!.showLoading = false;
+                    applicationContext!.token = null;
+                    window.location = "/login";
+                    return;
+                } else if (response.status === 400) {
+                    applicationContext!.showLoading = false;
+                    const body: null | undefined | Record<string, string[]> = await response.json();
+                    if (!!body) {
+                        Object.entries(body).forEach(([field, messages]) => {
+                            if (field === "Nomor Kunjungan") setNomorError(true);
+                            if (field === "Tanggal") setTanggalError(true);
+                            if (field === "Nama") setNamaError(true);
+                            if (field === "Jenis") setJenisError(true);
+                            if (field === "Umur") setUmurError(true);
+                            if (field === "Pekerjaan") setPekerjaanError(true);
+                            if (field === "Alamat") setAlamatError(true);
+                            if (field === "Telepon") setTeleponError(true);
+                            if (field === "Permasalahan") setPermasalahanError(true);
+                            if (field === "Solusi") setSolusiError(true);
+                            messages.forEach(message => {
+                                applicationContext?.openErrorModal(`<b>${field}</b> : ${message}`);
+                            })
+                        })
+                    }
+                } else {
+                    applicationContext!.showLoading = false;
+                    applicationContext?.openErrorModal(`Terjadi kesalahan`);
+                }
             }
         }
     }
@@ -348,6 +370,14 @@ export const Form = (props: { type: FormType }) => {
                     setError: setSolusiError,
                     defaultValue: layananResponse?.solusi,
                 },
+                {
+                    ref: dokumentasiRef,
+                    type: "file",
+                    title: "Dokumentasi",
+                    error: dokumentasiError,
+                    setError: setDokumentasiError,
+                    defaultValue: layananResponse?.dokumentasi,
+                },
             ].map(e => (
                 <div key={e.title} className={"w-full flex flex-col lg:flex-row items-start lg:justify-between"}>
                     <div className={`w-full min-h-10 lg:w-[15rem] py-1.5`}>
@@ -383,6 +413,22 @@ export const Form = (props: { type: FormType }) => {
                                       onInput={() => e.setError(false)}
                                       defaultValue={e.defaultValue}
                             />
+                        )}
+                        {e.type === "file" && (
+                            <div>
+                                <input ref={dokumentasiRef}
+                                       type={"file"}
+                                       className={"hidden"}
+                                       accept={"image/jpeg"}
+                                       multiple={false}
+                                />
+                                <button className={"duration-150 w-40 h-10 rounded bg-teal-500 hover:bg-teal-400 fill-white text-white"} onClick={() => dokumentasiRef.current!.click()}>
+                                    <div className={"w-full h-full flex items-center justify-center"}>
+                                        <ImageSVG className={"w-6 h-6 fill-inherit"}/>
+                                        Upload Gambar
+                                    </div>
+                                </button>
+                            </div>
                         )}
                         {e.type === "aspek" && (
                             <div className={"w-full grid grid-cols-2"}>

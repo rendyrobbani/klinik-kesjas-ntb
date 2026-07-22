@@ -25,6 +25,7 @@ export type LayananResponse = {
      isLainLain: boolean;
      permasalahan: string|null;
      solusi: string|null;
+     dokumentasi: string|null;
      idPetugas: string|null;
      namaPetugas: string|null;
      createdAt: string|null;
