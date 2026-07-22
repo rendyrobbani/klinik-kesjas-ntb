@@ -11,6 +11,7 @@ import type {PageNumberRef} from "../../components/page-number/PageNumberRef.tsx
 import {SearchUtil} from "../../util/SearchUtil.ts";
 import {Dialog} from "../../components/dialog/Dialog.tsx";
 import {Link} from "react-router-dom";
+import {printLayanan} from "../../event/printLayanan.ts";
 
 export const Home = () => {
 
@@ -77,6 +78,13 @@ export const Home = () => {
                 </div>
             </Dialog>
         );
+    }
+
+    const handlePrint = async (row: LayananResponse) => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(await printLayanan(row));
+        a.download = "test.docx";
+        a.click();
     }
 
     useEffect(() => {
@@ -230,7 +238,7 @@ export const Home = () => {
                                         <button className={"w-10 h-10 rounded duration-150 flex items-center justify-center bg-red-200 fill-red-500 hover:bg-red-500 hover:fill-white"} onClick={() => handleDelete(row)}>
                                             <DeleteSVG className={"w-5 h-5 fill-inherit"}/>
                                         </button>
-                                        <button className={"w-10 h-10 rounded duration-150 flex items-center justify-center bg-blue-200 fill-blue-500 hover:bg-blue-500 hover:fill-white"}>
+                                        <button className={"w-10 h-10 rounded duration-150 flex items-center justify-center bg-blue-200 fill-blue-500 hover:bg-blue-500 hover:fill-white"} onClick={() => handlePrint(row)}>
                                             <PrintSVG className={"w-5 h-5 fill-inherit"}/>
                                         </button>
                                     </div>
