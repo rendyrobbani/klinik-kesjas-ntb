@@ -11,6 +11,7 @@ import {Dashboard} from "../components/dashboard/Dashboard.tsx";
 import {Home} from "../pages/home/Home.tsx";
 import {DialogRoot} from "../components/dialog/DialogRoot.tsx";
 import type {DialogRef} from "../components/dialog/DialogRef.ts";
+import {Form} from "../pages/form/Form.tsx";
 
 export const Application = () => {
 
@@ -115,6 +116,14 @@ export const Application = () => {
                             {
                                 index: true,
                                 element: <Home/>,
+                            },
+                            {
+                                path: "/tambah",
+                                element: <Form type={"create"}/>,
+                            },
+                            {
+                                path: "/edit/:id",
+                                element: <Form type={"update"}/>,
                             }
                         ],
                     },

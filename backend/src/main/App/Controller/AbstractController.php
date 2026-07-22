@@ -22,9 +22,7 @@ abstract class AbstractController
 		$config = ApplicationConfig::security();
 		return JWT::encode([
 			"id" => $idUser,
-			"iat" => time(),
-			"exp" => time() + 5,
-			//"exp" => time() + ($config->expiredTime() * 60),
+			"exp" => time() + ($config->expiredTime() * 60),
 		], $config->secretKey(), "HS256");
 	}
 
@@ -49,9 +47,6 @@ abstract class AbstractController
 		http_response_code($status);
 		if ($token = $this->encodeToken()) setcookie("x-auth-token", $token, [
 			"path" => "/",
-//			"httponly" => true,
-//			"secure" => false,
-//			"samesite" => "Strict"
 		]);
 	}
 

@@ -19,7 +19,6 @@ class LayananControllerTest extends TestCase
 		$this->layananService = $this->createMock(LayananService::class);
 
 		$this->controller = new LayananController(
-			$this->layananService
 		);
 	}
 

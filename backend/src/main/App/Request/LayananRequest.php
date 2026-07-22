@@ -4,13 +4,9 @@ namespace RendyRobbani\Klinik\Kesjas\NTB\App\Request;
 
 class LayananRequest
 {
+	private int|null $nomor;
+
 	private string|null $tanggal;
-
-	private string|null $nomorSurat;
-
-	private string|null $tanggalSurat;
-
-	private string|null $komunitas;
 
 	private string|null $nama;
 
@@ -52,15 +48,11 @@ class LayananRequest
 
 	private string|null $solusi;
 
-	private string|null $idPetugas;
-
 	public function validate(): array
 	{
 		$errors = [];
+		if (!isset($this->nomor) || $this->nomor == null || $this->nomor == 0) $errors["Nomor Kunjungan"] = ["tidak boleh kosong"];
 		if (!isset($this->tanggal) || $this->tanggal == null || trim($this->tanggal) == "") $errors["Tanggal"] = ["tidak boleh kosong"];
-		if (!isset($this->nomorSurat) || $this->nomorSurat == null || trim($this->nomorSurat) == "") $errors["Nomor Surat Perintah"] = ["tidak boleh kosong"];
-		if (!isset($this->tanggalSurat) || $this->tanggalSurat == null || trim($this->tanggalSurat) == "") $errors["Tanggal Surat Perintah"] = ["tidak boleh kosong"];
-		if (!isset($this->komunitas) || $this->komunitas == null || trim($this->komunitas) == "") $errors["Komunitas"] = ["tidak boleh kosong"];
 		if (!isset($this->nama) || $this->nama == null || trim($this->nama) == "") $errors["Nama"] = ["tidak boleh kosong"];
 		if (!isset($this->jenis) || $this->jenis == null || $this->jenis == 0) $errors["Jenis"] = ["tidak boleh kosong"];
 		if (!isset($this->umur) || $this->umur == null || $this->umur == 0) $errors["Umur"] = ["tidak boleh kosong"];
@@ -69,8 +61,18 @@ class LayananRequest
 		if (!isset($this->telepon) || $this->telepon == null || trim($this->telepon) == "") $errors["Telepon"] = ["tidak boleh kosong"];
 		if (!isset($this->permasalahan) || $this->permasalahan == null || trim($this->permasalahan) == "") $errors["Permasalahan"] = ["tidak boleh kosong"];
 		if (!isset($this->solusi) || $this->solusi == null || trim($this->solusi) == "") $errors["Solusi"] = ["tidak boleh kosong"];
-		if (!isset($this->idPetugas) || $this->idPetugas == null || trim($this->idPetugas) == "") $errors["NRP Petugas"] = ["tidak boleh kosong"];
 		return $errors;
+	}
+
+	public function getNomor(): int|null
+	{
+		return $this->nomor;
+	}
+
+	public function setNomor(int|null $nomor): LayananRequest
+	{
+		$this->nomor = $nomor;
+		return $this;
 	}
 
 	public function getTanggal(): string|null
@@ -81,39 +83,6 @@ class LayananRequest
 	public function setTanggal(string|null $tanggal): LayananRequest
 	{
 		$this->tanggal = $tanggal;
-		return $this;
-	}
-
-	public function getNomorSurat(): string|null
-	{
-		return $this->nomorSurat ?? null;
-	}
-
-	public function setNomorSurat(string|null $nomorSurat): LayananRequest
-	{
-		$this->nomorSurat = $nomorSurat;
-		return $this;
-	}
-
-	public function getTanggalSurat(): string|null
-	{
-		return $this->tanggalSurat ?? null;
-	}
-
-	public function setTanggalSurat(string|null $tanggalSurat): LayananRequest
-	{
-		$this->tanggalSurat = $tanggalSurat;
-		return $this;
-	}
-
-	public function getKomunitas(): string|null
-	{
-		return $this->komunitas ?? null;
-	}
-
-	public function setKomunitas(string|null $komunitas): LayananRequest
-	{
-		$this->komunitas = $komunitas;
 		return $this;
 	}
 
@@ -334,17 +303,6 @@ class LayananRequest
 	public function setSolusi(string|null $solusi): LayananRequest
 	{
 		$this->solusi = $solusi;
-		return $this;
-	}
-
-	public function getIdPetugas(): string|null
-	{
-		return $this->idPetugas ?? null;
-	}
-
-	public function setIdPetugas(string|null $idPetugas): LayananRequest
-	{
-		$this->idPetugas = $idPetugas;
 		return $this;
 	}
 }

@@ -7,7 +7,6 @@ use RendyRobbani\Klinik\Kesjas\NTB\App\Entity\LayananEntity;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Exception\BadRequestException;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Exception\NotFoundException;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Repository\LayananRepository;
-use RendyRobbani\Klinik\Kesjas\NTB\App\Repository\UserRepository;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Request\LayananRequest;
 use RendyRobbani\Klinik\Kesjas\NTB\App\Response\LayananResponse;
 
@@ -15,19 +14,15 @@ class LayananServiceImpl implements LayananService
 {
 	private \PDO $connection;
 
-	private UserRepository $userRepository;
-
 	private LayananRepository $layananRepository;
 
 	/**
 	 * @param \PDO $connection
-	 * @param UserRepository $userRepository
 	 * @param LayananRepository $layananRepository
 	 */
-	public function __construct(\PDO $connection, UserRepository $userRepository, LayananRepository $layananRepository)
+	public function __construct(\PDO $connection, LayananRepository $layananRepository)
 	{
 		$this->connection = $connection;
-		$this->userRepository = $userRepository;
 		$this->layananRepository = $layananRepository;
 	}
 
@@ -57,9 +52,6 @@ class LayananServiceImpl implements LayananService
 		$errors = $request->validate();
 		if (sizeof($errors) > 0) throw new BadRequestException($errors);
 
-		$user = $this->userRepository->selectById($request->getIdPetugas());
-		if ($user == null) throw new BadRequestException(["idPetugas" => ["tidak ditemukan"]]);
-
 		try {
 			$this->connection->beginTransaction();
 
@@ -69,9 +61,6 @@ class LayananServiceImpl implements LayananService
 			$entity = new LayananEntity();
 			$entity->setNomor(sizeof(array_filter($this->layananRepository->selectAll(), fn($entity) => $entity->getTanggal() != null && substr($entity->getTanggal(), 0, 10) == substr($request->getTanggal(), 0, 10))) + 1);
 			$entity->setTanggal($request->getTanggal());
-			$entity->setNomorSurat($request->getNomorSurat());
-			$entity->setTanggalSurat($request->getTanggalSurat());
-			$entity->setKomunitas($request->getKomunitas());
 			$entity->setNama($request->getNama());
 			$entity->setJenis($request->getJenis());
 			$entity->setUmur($request->getUmur());
@@ -92,7 +81,7 @@ class LayananServiceImpl implements LayananService
 			$entity->setIsLainLain($request->getIsLainLain());
 			$entity->setPermasalahan($request->getPermasalahan());
 			$entity->setSolusi($request->getSolusi());
-			$entity->setIdPetugas($request->getIdPetugas());
+			$entity->setIdPetugas($actionBy);
 			$entity->setCreatedAt($actionAt);
 			$entity->setCreatedBy($actionBy);
 			$entity->setUpdatedAt($actionAt);
@@ -102,9 +91,10 @@ class LayananServiceImpl implements LayananService
 			$entity->setDeletedBy(null);
 
 			$entity = $this->layananRepository->save($entity);
+
 			$this->connection->commit();
 
-			return LayananResponse::fromEntity($entity);
+			return LayananResponse::fromEntity($this->layananRepository->selectById($entity->getId()));
 		} catch (\Throwable $exception) {
 			$this->connection->rollBack();
 			throw $exception;
@@ -122,16 +112,12 @@ class LayananServiceImpl implements LayananService
 		$errors = $request->validate();
 		if (sizeof($errors) > 0) throw new BadRequestException($errors);
 
-		$user = $this->userRepository->selectById($request->getIdPetugas());
-		if ($user == null) throw new BadRequestException(["idPetugas" => ["tidak ditemukan"]]);
-
 		try {
 			$this->connection->beginTransaction();
 
 			$actionAt = date_format(new \DateTimeImmutable(), "Y-m-d H:i:s");
 			$actionBy = ApplicationContext::getIdUser();
 
-			$entity->setKomunitas($request->getKomunitas());
 			$entity->setNama($request->getNama());
 			$entity->setJenis($request->getJenis());
 			$entity->setUmur($request->getUmur());
@@ -152,7 +138,6 @@ class LayananServiceImpl implements LayananService
 			$entity->setIsLainLain($request->getIsLainLain());
 			$entity->setPermasalahan($request->getPermasalahan());
 			$entity->setSolusi($request->getSolusi());
-			$entity->setIdPetugas($request->getIdPetugas());
 			$entity->setCreatedAt($actionAt);
 			$entity->setCreatedBy($actionBy);
 			$entity->setUpdatedAt($actionAt);

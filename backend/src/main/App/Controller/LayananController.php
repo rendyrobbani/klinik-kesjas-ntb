@@ -51,10 +51,8 @@ class LayananController extends AbstractController
 	{
 		$request = json_decode(file_get_contents('php://input'), true);
 		$response = $this->layananService->create((new LayananRequest())
+			->setNomor($request["nomor"] ?? null)
 			->setTanggal($request["tanggal"] ?? null)
-			->setNomorSurat($request["nomorSurat"] ?? null)
-			->setTanggalSurat($request["tanggalSurat"] ?? null)
-			->setKomunitas($request["komunitas"] ?? null)
 			->setNama($request["nama"] ?? null)
 			->setJenis($request["jenis"] ?? null)
 			->setUmur($request["umur"] ?? null)
@@ -75,7 +73,6 @@ class LayananController extends AbstractController
 			->setIsLainLain($request["isLainLain"] ?? false)
 			->setPermasalahan($request["permasalahan"] ?? null)
 			->setSolusi($request["solusi"] ?? null)
-			->setIdPetugas($request["idPetugas"] ?? null)
 		);
 		$this->sendJson(200, "Ok", $response);
 	}
@@ -90,9 +87,6 @@ class LayananController extends AbstractController
 		$request = json_decode(file_get_contents('php://input'), true);
 		$response = $this->layananService->update((new LayananRequest())
 			->setTanggal($request["tanggal"] ?? null)
-			->setNomorSurat($request["nomorSurat"] ?? null)
-			->setTanggalSurat($request["tanggalSurat"] ?? null)
-			->setKomunitas($request["komunitas"] ?? null)
 			->setNama($request["nama"] ?? null)
 			->setJenis($request["jenis"] ?? null)
 			->setUmur($request["umur"] ?? null)
@@ -112,8 +106,7 @@ class LayananController extends AbstractController
 			->setIsYanPolri($request["isYanPolri"] ?? false)
 			->setIsLainLain($request["isLainLain"] ?? false)
 			->setPermasalahan($request["permasalahan"] ?? null)
-			->setSolusi($request["solusi"] ?? null)
-			->setIdPetugas($request["idPetugas"] ?? null),
+			->setSolusi($request["solusi"] ?? null),
 			$id
 		);
 		$this->sendJson(200, "Ok", $response);

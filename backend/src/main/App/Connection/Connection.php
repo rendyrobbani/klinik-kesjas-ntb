@@ -21,7 +21,7 @@ class Connection
 	 */
 	public static function instance(): \PDO
 	{
-		if (self::$instance === null) {
+		if (self::$instance == null) {
 			$config = ApplicationConfig::database();
 			self::$instance = new \PDO($config->url(), $config->username(), $config->password());
 		}

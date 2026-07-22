@@ -1,5 +1,4 @@
 import {useApplicationContext} from "../../hook/useApplicationContext.tsx";
-import {useNavigate} from "react-router-dom";
 import {useEffect, useRef, useState} from "react";
 import type {LayananResponse} from "./LayananResponse.ts";
 import {ValueOfStringUtil} from "../../util/ValueOfStringUtil.ts";
@@ -11,11 +10,11 @@ import {PageNumber} from "../../components/page-number/PageNumber.tsx";
 import type {PageNumberRef} from "../../components/page-number/PageNumberRef.tsx";
 import {SearchUtil} from "../../util/SearchUtil.ts";
 import {Dialog} from "../../components/dialog/Dialog.tsx";
+import {Link} from "react-router-dom";
 
 export const Home = () => {
 
     const applicationContext = useApplicationContext();
-    const navigate = useNavigate();
 
     const findRef = useRef<null | HTMLInputElement>(null);
     const sizeRef = useRef<null | HTMLSelectElement>(null);
@@ -55,6 +54,7 @@ export const Home = () => {
                                     "Authorization": `Bearer ${applicationContext?.token ?? ""}`
                                 },
                                 method: "DELETE",
+                                credentials: "include"
                             }).then(response => {
                                 if (response.ok) {
                                     applicationContext!.closeDialog();
@@ -80,8 +80,8 @@ export const Home = () => {
     }
 
     useEffect(() => {
-        const token = applicationContext?.token ?? null;
-        if (token == null || token == "") navigate("/login");
+        // const token = applicationContext?.token ?? null;
+        // if (token == null || token == "") navigate("/login");
     }, []);
 
     useEffect(() => {
@@ -93,6 +93,7 @@ export const Home = () => {
                 "Authorization": `Bearer ${applicationContext?.token ?? ""}`
             },
             method: "GET",
+            credentials: "include"
         }).then(response => {
             if (response.ok) response.json().then((body: LayananResponse[]) => {
                 setListLayanan(body)
@@ -102,7 +103,8 @@ export const Home = () => {
                 if (response.status == 401) {
                     applicationContext!.token = null;
                     applicationContext!.showLoading = false;
-                    navigate("/login");
+                    // @ts-ignore
+                    window.location = "/login";
                 } else {
                     response.json().then((error: { message: string }) => {
                         applicationContext!.openErrorModal(error.message);
@@ -114,7 +116,7 @@ export const Home = () => {
             applicationContext!.openErrorModal(error.message);
             applicationContext!.showLoading = false;
         });
-    }, []);
+    }, [listLayanan]);
 
     useEffect(() => {
         const filter: LayananResponse[] = [];
@@ -151,7 +153,6 @@ export const Home = () => {
         if (pageRef.current) {
             pageRef.current.value = page;
             pageRef.current.total = Math.ceil(filter.length / size);
-            console.log(filter.length)
         }
     }, [listLayanan, find, page, size]);
 
@@ -169,9 +170,11 @@ export const Home = () => {
                     />
                 </div>
                 <div className={"w-full lg:w-1/2 flex items-center justify-end"}>
-                    <button className={"w-24 h-10 rounded duration-150 bg-red-900 focus:ring-4 focus:ring-red-700 text-white"}>
-                        Tambah
-                    </button>
+                    <Link to={"/tambah"}>
+                        <button className={"w-24 h-10 rounded duration-150 bg-red-900 focus:ring-4 focus:ring-red-700 text-white"}>
+                            Tambah
+                        </button>
+                    </Link>
                 </div>
             </div>
             <div className={"w-full flex items-center justify-center"}>
@@ -219,9 +222,11 @@ export const Home = () => {
                                 </td>
                                 <td className={clsx("px-4 py-2 place-content-start", index > 0 && "border-t border-t-neutral-300", "border-l border-l-neutral-300", "w-48")}>
                                     <div className={"flex items-center justify-center gap-2"}>
-                                        <button className={"w-10 h-10 rounded duration-150 flex items-center justify-center bg-yellow-200 fill-yellow-500 hover:bg-yellow-500 hover:fill-white"}>
-                                            <EditSVG className={"w-5 h-5 fill-inherit"}/>
-                                        </button>
+                                        <Link to={`/edit/${row.id}`}>
+                                            <button className={"w-10 h-10 rounded duration-150 flex items-center justify-center bg-yellow-200 fill-yellow-500 hover:bg-yellow-500 hover:fill-white"}>
+                                                <EditSVG className={"w-5 h-5 fill-inherit"}/>
+                                            </button>
+                                        </Link>
                                         <button className={"w-10 h-10 rounded duration-150 flex items-center justify-center bg-red-200 fill-red-500 hover:bg-red-500 hover:fill-white"} onClick={() => handleDelete(row)}>
                                             <DeleteSVG className={"w-5 h-5 fill-inherit"}/>
                                         </button>

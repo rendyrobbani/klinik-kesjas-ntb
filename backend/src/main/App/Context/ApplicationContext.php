@@ -96,7 +96,7 @@ class ApplicationContext
 	 */
 	public static function layananService(): LayananService
 	{
-		if (self::$layananService === null) self::$layananService = new LayananServiceImpl(Connection::instance(), self::userRepository(), self::layananRepository());
+		if (self::$layananService === null) self::$layananService = new LayananServiceImpl(Connection::instance(), self::layananRepository());
 		return self::$layananService;
 	}
 }
